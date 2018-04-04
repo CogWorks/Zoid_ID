@@ -94,18 +94,18 @@ def update_feedback_adaptive(trial_counter, wrong_counter,response_time_counter,
     if last_block_acc == -1:
         Feedback_Screen_Acc_old.text = ""
     else:
-        if percent_correct + 2 > last_block_acc:
+        if percent_correct - 2 > last_block_acc:
             Feedback_Screen_Acc_old.text = "Improved!"
-        elif percent_correct - 2 > last_block_acc:
+        elif percent_correct + 2 > last_block_acc:
             Feedback_Screen_Acc_old.text = "Kept!"
         else:
             Feedback_Screen_Acc_old.text = "Dropped..."
     if last_block_spd == -1:
         Feedback_Screen_Spd_old.text = ""
     else:
-        if average_time + 0.2 > last_block_spd:
+        if average_time - 0.15 > last_block_spd:
             Feedback_Screen_Spd_old.text = "Improved!"
-        elif average_time - 0.2 > last_block_spd:
+        elif average_time + 0.15 > last_block_spd:
             Feedback_Screen_Spd_old.text = "Kept!"
         else:
             Feedback_Screen_Spd_old.text = "Dropped..."
