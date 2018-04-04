@@ -1,4 +1,5 @@
-# PL-Tetris
+# Zoid ID
+# Readme copied from old PL-Tetris Repo
 
 ##Installation
 
