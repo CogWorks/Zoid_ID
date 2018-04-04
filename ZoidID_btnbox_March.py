@@ -60,7 +60,7 @@ endExpNow = False  # flag for 'escape' or other condition => quit the exp
 
 # Setup the Window
 win = visual.Window(size=(1600, 900), fullscr=True, screen=1, allowGUI=False, allowStencil=False,
-                    monitor=u'testMonitor', color=[0.98,0.98,0.98], colorSpace='rgb',
+                    monitor=u'testMonitor', color=[1, 1, 1], colorSpace='rgb',
                     blendMode='avg', useFBO=True
                     )
 # store frame rate of monitor if we can measure it successfully
@@ -79,8 +79,8 @@ def update_stimuli(stimuli_entry, Zoid_Left, Zoid_Right):
 
 def update_feedback_adaptive(trial_counter, wrong_counter,response_time_counter,pre_post_break_flag):
             #designed to try to keep subject within a certain accuracy range by advising response time
-    speed_up = .96			#if accuracy higher than speed_up, advise increase speed
-    slow_down = .94			#if accuracy lower than slow_down, advise decrease speed
+    speed_up = .95			#if accuracy higher than speed_up, advise increase speed
+    slow_down = .93			#if accuracy lower than slow_down, advise decrease speed
                                                     #if between speed_up and slow_down, keep same speed
     global last_block_acc
     global last_block_spd
@@ -128,7 +128,7 @@ def update_feedback_adaptive(trial_counter, wrong_counter,response_time_counter,
     elif (pre_post_break_flag == "pre"):
         Feedback_Screen.pos = [0, 0]
         Feedback_Screen.height = 0.09
-        Feedback_Screen.text = feedback+feedback_message+"You can now take a break. When you are ready to continue, place you fingers, then press any button.\n(Maximum break time: 5 mins)"
+        Feedback_Screen.text = feedback+feedback_message+"You can now take a break. When you are ready to continue, place you fingers, then press any button.\n(Maximum break time: 3 mins)"
     elif (pre_post_break_flag == "post"):
         Feedback_Screen.pos = [0, .5]
         Feedback_Screen.height = 0.08
@@ -361,15 +361,15 @@ Ready_Cue = visual.TextStim(win=win, ori=0, name='Ready_Cue',
 Zoid_Left = visual.ShapeStim(win=win, name='Zoid_Left',units='cm', 
                              vertices=vert_o,
                              ori=0, pos=[-5, 0],
-                             lineWidth=1, lineColor=[1,1,1], lineColorSpace='rgb',
-                             fillColor=[0.02,0.02,0.02], fillColorSpace='rgb',
+                             lineWidth=3, lineColor=[0.5,0.5,0.5], lineColorSpace='rgb',
+                             fillColor=[0.01,0.01,0.01], fillColorSpace='rgb',
                              opacity=1,depth=-3.0, 
 interpolate=True)
 Zoid_Right = visual.ShapeStim(win=win, name='Zoid_Right',units='cm', 
                               vertices=vert_o,
                               ori=0, pos=[5, 0],
-                              lineWidth=1, lineColor=[1,1,1], lineColorSpace='rgb',
-                              fillColor=[0.02,0.02,0.02], fillColorSpace='rgb',
+                              lineWidth=3, lineColor=[0.5,0.5,0.5], lineColorSpace='rgb',
+                              fillColor=[0.01,0.01,0.01], fillColorSpace='rgb',
                               opacity=1,depth=-4.0, 
 interpolate=True)
 Button_Instructions = visual.TextStim(win=win, ori=0, name='Button_Instructions',
