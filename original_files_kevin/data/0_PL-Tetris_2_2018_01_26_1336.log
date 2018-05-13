@@ -1,0 +1,25 @@
+1.4759 	ERROR 	avbin.dll failed to load. Try importing psychopy.visual
+  as the first library (before anything that uses scipy)
+  and make sure that avbin is installed.
+5.7631 	EXP 	Created window1 = Window(allowGUI=False, allowStencil=False, autoLog=True, bitsMode=UNKNOWN, blendMode='avg', color=array([ 0.95,  0.95,  0.95]), colorSpace='rgb', fullscr=UNKNOWN, gamma=None, lms=UNKNOWN, monitor=<psychopy.monitors.calibTools.Monitor object at 0x1A60C6D0>, multiSample=False, name='window1', numSamples=2, pos=[0, 0], screen=0, size=array([1600,  900]), stereo=False, units=u'norm', useFBO=True, useRetina=False, viewOri=0.0, viewPos=None, viewScale=None, waitBlanking=True, winType='pyglet')
+5.7632 	EXP 	window1: recordFrameIntervals = False
+5.9593 	EXP 	window1: recordFrameIntervals = True
+6.1806 	EXP 	window1: recordFrameIntervals = False
+6.3162 	EXP 	Created Orientation_Cue = TextStim(alignHoriz='center', alignVert='center', antialias=True, autoLog=True, bold=False, color=u'black', colorSpace='named', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font=u'Arial', fontFiles=[], height=0.1, italic=False, name='Orientation_Cue', opacity=1.0, ori=0, pos=array([ 0.,  0.]), rgb=array([ 0.,  0.,  0.]), text=u'\u25cb', units=u'norm', win=Window(...), wrapWidth=1)
+6.3273 	EXP 	Created Ready_Cue = TextStim(alignHoriz='center', alignVert='center', antialias=True, autoLog=True, bold=False, color=u'black', colorSpace='named', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font=u'Arial', fontFiles=[], height=0.1, italic=False, name='Ready_Cue', opacity=1.0, ori=0, pos=array([ 0.,  0.]), rgb=array([ 0.,  0.,  0.]), text=u'\u23fa', units=u'norm', win=Window(...), wrapWidth=1)
+6.3391 	EXP 	Created Zoid_Left = ShapeStim(autoDraw=False, autoLog=True, closeShape=True, contrast=1.0, depth=-3.0, fillColor=array([ 0.05,  0.05,  0.05]), fillColorSpace='rgb', interpolate=True, lineColor=array([ 1.,  1.,  1.]), lineColorSpace='rgb', lineWidth=1, name='Zoid_Left', opacity=1.0, ori=array(0.0), pos=array([-5.,  0.]), size=array([ 1.,  1.]), units='cm', vertices=ndarray(...), win=Window(...), windingRule=None)
+6.3412 	EXP 	Created Zoid_Right = ShapeStim(autoDraw=False, autoLog=True, closeShape=True, contrast=1.0, depth=-4.0, fillColor=array([ 0.05,  0.05,  0.05]), fillColorSpace='rgb', interpolate=True, lineColor=array([ 1.,  1.,  1.]), lineColorSpace='rgb', lineWidth=1, name='Zoid_Right', opacity=1.0, ori=array(0.0), pos=array([ 5.,  0.]), size=array([ 1.,  1.]), units='cm', vertices=ndarray(...), win=Window(...), windingRule=None)
+6.4336 	EXP 	Created Button_Instructions = TextStim(alignHoriz='center', alignVert='center', antialias=True, autoLog=True, bold=False, color=u'black', colorSpace='named', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font=u'Arial', fontFiles=[], height=0.07, italic=False, name='Button_Instructions', opacity=1.0, ori=0, pos=array([ 0. ,  0.5]), rgb=array([ 0.,  0.,  0.]), text=unicode(...), units=u'norm', win=Window(...), wrapWidth=1)
+6.4509 	EXP 	Created x_instruction = TextStim(alignHoriz='center', alignVert='center', antialias=True, autoLog=True, bold=False, color=u'tomato', colorSpace='named', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font=u'Arial', fontFiles=[], height=0.1, italic=False, name='x_instruction', opacity=1.0, ori=0, pos=array([-0.7, -0.8]), rgb=array([ 255.,   99.,   71.]), text=u'DIFFERENT\nx', units=u'norm', win=Window(...), wrapWidth=1)
+6.4607 	EXP 	Created m_instruction = TextStim(alignHoriz='right', alignVert='center', antialias=True, autoLog=True, bold=False, color=u'lightseagreen', colorSpace='named', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font=u'Arial', fontFiles=[], height=0.1, italic=False, name='m_instruction', opacity=1.0, ori=0, pos=array([ 0.7, -0.8]), rgb=array([  32.,  178.,  170.]), text=u'SAME\nm', units=u'norm', win=Window(...), wrapWidth=1)
+6.4788 	EXP 	Created Feedback_Screen = TextStim(alignHoriz='center', alignVert='center', antialias=True, autoLog=True, bold=False, color=u'black', colorSpace='named', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font=u'Arial', fontFiles=[], height=0.1, italic=False, name='Feedback_Screen', opacity=1.0, ori=0, pos=array([ 0.,  0.]), rgb=array([ 0.,  0.,  0.]), text=u'Placeholder_text', units=u'norm', win=Window(...), wrapWidth=1)
+6.4802 	EXP 	window1: blendMode = 'avg'
+6.4808 	EXP 	window1: blendMode = 'avg'
+6.4811 	EXP 	window1: blendMode = 'avg'
+6.4902 	EXP 	x_instruction: autoDraw = True
+6.4902 	EXP 	m_instruction: autoDraw = True
+6.4902 	EXP 	Button_Instructions: autoDraw = True
+11.2935 	DATA 	Keypress: escape
+11.2948 	DATA 	Keypress: escape
+11.4946 	EXP 	Created sequence: random, trialTypes=1, nReps=60, seed=None
+11.6974 	EXP 	New trial (rep=0, index=0): None

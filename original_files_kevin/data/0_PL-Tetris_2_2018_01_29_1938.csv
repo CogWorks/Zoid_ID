@@ -1,0 +1,3 @@
+trials.thisRepN,trials.thisTrialN,trials.thisN,trials.thisIndex,Block_Number,Trial_Number,Subject_Key,Correct_Key,Subject_Response,Correct_Response,Answered_Correctly,Left_Zoid,Left_Zoid_Orientation,Right_Zoid,Right_Zoid_Orientation,Response.rt,date,frameRate,expName,session,participant,
+0,0,0,0,0,0,x,m,yes,no,False,s,90,z,0,3.66802730435,2018_01_29_1938,49.8421536989,PL-Tetris_2,001,0,
+1,0,1,0,0,1,m,x,no,yes,False,t,90,t,90,1.56608058373,2018_01_29_1938,49.8421536989,PL-Tetris_2,001,0,

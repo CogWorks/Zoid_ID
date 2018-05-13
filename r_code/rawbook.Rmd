@@ -1,0 +1,216 @@
+---
+title: "Untitled"
+output: pdf_document
+---
+
+CLEAR ALL AND LOAD PACKAGES
+```{r,echo=FALSE,warning=FALSE,collapse=TRUE,eval=FALSE,tidy=TRUE}
+# RESET -- Run to clear all data and start fresh...
+
+pkgs = names(sessionInfo()$otherPkgs)
+if (length(pkgs) > 0){
+  pkgs = paste('package:', pkgs, sep = "")
+  lapply(pkgs, detach, character.only = TRUE, unload = TRUE)
+}
+
+rm(list=ls())
+
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=30),tidy=TRUE)
+
+library(ggplot2)
+library(car)
+library(Rmisc)
+library(lubridate) #   #   for setting up saved files so that filenames include today's date
+
+daysDate <- format(now(), "%y%m%d")
+F.ck.class <- function(x) data.frame(COL = seq_along(x), CLASS = sapply(x, class))
+```
+
+
+DATASETS
+Data from Test Run Date: 03/05/2018 
+```{r,tidy=TRUE}
+file.data <- read.csv("combined_raw.csv", header = TRUE)
+raw.data <- subset(file.data, Response.rt.box < 15)
+F.ck.class(raw.data)
+```
+
+# COL   CLASS
+# Block_Number             1 integer
+# Trial_Number             2 integer
+# Subject_Key_Box          3 integer
+# Correct_Response         4  factor
+# Answered_Correctly       5 logical
+# Left_Zoid                6  factor
+# Left_Zoid_Orientation    7 integer
+# Right_Zoid               8  factor
+# Right_Zoid_Orientation   9 integer
+# Response.rt.box         10 numeric
+# date                    11  factor
+# frameRate               12 numeric
+# SID                     13  factor
+
+RAW DATA SELECTION
+```{r,tidy=TRUE}
+raw.data$deg.diff <- abs(raw.data$Left_Zoid_Orientation - raw.data$Right_Zoid_Orientation)
+raw.data$deg.diff.level <- factor(raw.data$deg.diff, levels = c("0","90","180","270"))
+same.data <- subset(raw.data, Correct_Response == "same")
+same.data$deg.diff.level <- factor(same.data$deg.diff, levels = c("0","90","180","270"))
+
+same.data$Left_Zoid  <- as.factor(same.data$Left_Zoid)
+
+same.data_sz <- subset(same.data, Left_Zoid == "s" | Left_Zoid == "z")
+same.data_jl <- subset(same.data, Left_Zoid == "j" | Left_Zoid == "l")
+all_jl <- subset(raw.data, (Left_Zoid == "j" | Left_Zoid == "l")&(Right_Zoid == "j" | Right_Zoid == "l"))
+
+all_jl$Type <- ifelse(all_jl$Left_Zoid == "j" & all_jl$Right_Zoid == "j", "J J", ifelse(all_jl$Left_Zoid == "j" & all_jl$Right_Zoid == "l", "J L", ifelse(all_jl$Left_Zoid == "l" & all_jl$Right_Zoid == "l", "L L", ifelse(all_jl$Left_Zoid == "l" & all_jl$Right_Zoid == "j", "L J", "error"))))
+
+all_jl$Crit.level <- ifelse(all_jl$Crit.Score <= 7000, "low", ifelse(same.data$Crit.Score > 7000 & same.data$Crit.Score <= 15000), "mid", "high")
+
+all_n = length(unique(same.data$SID))
+same.data_lo <- subset(same.data, Crit.Score <= 7000)
+lo_n = length(unique(same.data_lo$SID))
+same.data_mid <- subset(same.data, Crit.Score > 7000 & Crit.Score <= 15000)
+mid_n = length(unique(same.data_mid$SID))
+same.data_hi <- subset(same.data, Crit.Score > 15000)
+hi_n = length(unique(same.data_hi$SID))
+
+sz.summ <- summarySE(data = same.data_sz, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
+jl.summ <- summarySE(data = same.data_jl, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
+
+sz.summ.sid <- summarySE(data = same.data_sz, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level", "SID"))
+jl.summ.sid <- summarySE(data = same.data_jl, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level", "SID"))
+
+shape.summ <- summarySE(data = same.data, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
+shape.summ.hi <- summarySE(data = same.data_hi, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
+shape.summ.mid <- summarySE(data = same.data_mid, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
+shape.summ.lo <- summarySE(data = same.data_lo, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
+
+jllj.summ <- summarySE(data = all_jl, measurevar = "Response.rt.box", groupvars = c("Type", "deg.diff.level"))
+
+raw.data$Block_Number  <- as.factor(raw.data$Block_Number)
+
+# NA's
+## first look at the NAs in the entire dataset
+NAs_zr <- raw.data[rowSums(is.na(raw.data)) > 0,]
+## good, no NAs
+
+library("plyr")
+library("dplyr")
+
+SID.data <- list()
+for(this.SID in unique(raw.data$SID))
+{
+  SID.data[[length(SID.data)+1]] <- raw.data[which(raw.data$SID==this.SID),]
+}
+
+tzr_summary <- ddply(raw.data, .(Block_Number, Correct_Response), function (x){
+	total_blocks = length(unique(x$Block_Number))
+	trials_per_block = length(unique(x$Trial_Number))
+	m_rt = mean(x$Response.rt.box)
+	med_rt = median(x$Response.rt.box)
+	correct = mean(x$Answered_Correctly)
+	data.frame(total_blocks, trials_per_block, m_rt, med_rt, correct)
+})
+
+SID.tzr.summ <- list()
+for(this.data in SID.data)
+{
+  this.tzr.summary <- ddply(this.data, .(Block_Number, Correct_Response), function (x){
+	total_blocks = length(unique(x$Block_Number))
+	trials_per_block = length(unique(x$Trial_Number))
+	m_rt = mean(x$Response.rt.box)
+	med_rt = median(x$Response.rt.box)
+	correct = mean(x$Answered_Correctly)
+	data.frame(total_blocks, trials_per_block, m_rt, med_rt, correct)
+  })
+  SID.tzr.summ[[length(SID.tzr.summ)+1]] <- this.tzr.summary
+}
+
+
+F.ck.class(tzr_summary)
+
+for(this_summ in SID.tzr.summ)
+{
+  F.ck.class(this_summ)
+}
+
+```
+
+PLOTTING
+```{r,tidy=TRUE}
+
+
+plt.7a <- ggplot(sz.summ.sid, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
+plt.7a + geom_line() + geom_point() + ylim(0, 2) + facet_grid(.~SID)
+
+plt.7b <- ggplot(jl.summ.sid, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
+plt.7b + geom_line() + geom_point() + ylim(0, 2) + facet_grid(.~SID) 
+
+plt.8a <- ggplot(sz.summ, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
+plt.8a + stat_summary(fun.y = mean, geom = "line") + stat_summary(fun.y = mean, geom = "point") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.05, position=position_dodge(width=0.3)) + ylim(0, 2) + theme_bw()
+
+plt.shape <- ggplot(shape.summ, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
+plt.shape + geom_line() + geom_point(size = 2.5) + ylim(0.5, 1.6) + theme_bw() + labs(title = "Response Time by Zoid and Orientation", subtitle = paste("all players, n =", all_n), y = "Response Time", x = "Abs. Degree Difference", colour = "Zoid Type") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2, position=position_dodge(width=0.3))
+
+plt.jl <- ggplot(jllj.summ, aes(x = deg.diff.level, y = Response.rt.box, group = Type))
+plt.jl + geom_line() + geom_point(size = 2.5) + ylim(0.5, 1.8) + theme_bw() + labs(title = "Response Time with all J L pairs", y = "Response Time", x = "Abs. Degree Difference") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2) + facet_grid(Type~.)
+
+plt.shapelo <- ggplot(shape.summ.lo, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
+plt.shapelo + geom_line() + geom_point(size = 2.5) + ylim(0.5, 1.6) + theme_bw() + labs(title = "Response Time by Zoid and Orientation", subtitle = paste("low skill players (Crit. Score 0~7000), n =", lo_n), y = "Response Time", x = "Abs. Degree Difference", colour = "Zoid Type") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2, position=position_dodge(width=0.3))
+
+plt.shapemid <- ggplot(shape.summ.mid, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
+plt.shapemid + geom_line() + geom_point(size = 2.5) + ylim(0.5, 1.6) + theme_bw() + labs(title = "Response Time by Zoid and Orientation", subtitle = paste("mid skill players (Crit. Score 7000~15000), n =", mid_n), y = "Response Time", x = "Abs. Degree Difference", colour = "Zoid Type") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2, position=position_dodge(width=0.3))
+
+plt.shapehi <- ggplot(shape.summ.hi, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
+plt.shapehi + geom_line() + geom_point(size = 2.5) + ylim(0.5, 1.6) + theme_bw() + labs(title = "Response Time by Zoid and Orientation", subtitle = paste("high skill players (Crit. Score 15000~), n =", hi_n), y = "Response Time", x = "Abs. Degree Difference", colour = "Zoid Type") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2, position=position_dodge(width=0.3))
+
+plt.9b <- ggplot(jl.summ, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
+plt.9b + stat_summary(fun.y = mean, geom = "line") + stat_summary(fun.y = mean, geom = "point") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.05, position=position_dodge(width=0.3)) + ylim(0, 2) + theme_bw() 
+
+raw.data$Block_Number  <- as.factor(raw.data$Block_Number)
+
+#   PROPORTION CORRECT BY SAME VS DIFF BY BLOCK
+tzr_propCorrect_by_blk <- ggplot(tzr_summary, aes(x=Block_Number, y=correct, group=Correct_Response, color=Correct_Response)) +
+	geom_line() +
+	geom_point() +
+	scale_shape_manual(values=c(17,19)) +
+	scale_color_manual(values=c("darkred", "darkblue")) +
+	annotate(geom="text", x=4, y=0.9125, label = "Proportion Correct for Same vs Different", color = "darkgreen") +
+	theme_bw()
+tzr_propCorrect_by_blk
+
+#	MEDIAN RT BY SAME VS DIFF RESPONSE BY BLOCK
+tzr_medRT_by_SameDif_by_blk <- ggplot(tzr_summary, aes(x=Block_Number, y=med_rt, group=Correct_Response, color=Correct_Response)) +
+	geom_line() +
+	geom_point() +
+	scale_shape_manual(values=c(17,19)) +
+	scale_color_manual(values=c("darkred", "darkblue")) +
+	annotate(geom = "text", x=6, y=1.5, label = "Medium Response Time for Correct Response", color = "darkgreen") +
+	theme_bw()
+tzr_medRT_by_SameDif_by_blk
+
+#   SUBJECT ACCURACY
+for (this.summ in SID.tzr.summ)
+{
+  subject_acc <- ggplot(this.summ, aes(x=Block_Number, y=correct, group=Correct_Response, color=Correct_Response)) +
+	geom_line() +
+	geom_point() +
+	scale_shape_manual(values=c(17,19)) +
+	scale_color_manual(values=c("darkred", "darkblue")) +
+	theme_bw()
+  print(subject_acc)
+  
+  tzr_medRT_by_SameDif_by_blk <- ggplot(tzr_summary, aes(x=Block_Number, y=med_rt, group=Correct_Response, color=Correct_Response)) +
+	geom_line() +
+	geom_point() +
+	scale_shape_manual(values=c(17,19)) +
+	scale_color_manual(values=c("darkred", "darkblue")) +
+	annotate(geom = "text", x=6, y=1.5, label = "Medium Response Time for Correct Response", color = "darkgreen") +
+	theme_bw()
+tzr_medRT_by_SameDif_by_blk
+}
+
+
+```
