@@ -66,7 +66,7 @@ all_jl <- subset(raw.data, (Left_Zoid == "j" | Left_Zoid == "l")&(Right_Zoid == 
 
 all_jl$Type <- ifelse(all_jl$Left_Zoid == "j" & all_jl$Right_Zoid == "j", "J J", ifelse(all_jl$Left_Zoid == "j" & all_jl$Right_Zoid == "l", "J L", ifelse(all_jl$Left_Zoid == "l" & all_jl$Right_Zoid == "l", "L L", ifelse(all_jl$Left_Zoid == "l" & all_jl$Right_Zoid == "j", "L J", "error"))))
 
-all_jl$Crit.level <- ifelse(all_jl$Crit.Score <= 7000, "low", ifelse(same.data$Crit.Score > 7000 & same.data$Crit.Score <= 15000), "mid", "high")
+all_jl$Crit.level <- ifelse(all_jl$Crit.Score <= 7000, "low", ifelse((same.data$Crit.Score > 7000 & same.data$Crit.Score <= 15000), "mid", "high"))
 
 all_n = length(unique(same.data$SID))
 same.data_lo <- subset(same.data, Crit.Score <= 7000)
@@ -79,15 +79,15 @@ hi_n = length(unique(same.data_hi$SID))
 sz.summ <- summarySE(data = same.data_sz, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
 jl.summ <- summarySE(data = same.data_jl, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
 
-sz.summ.sid <- summarySE(data = same.data_sz, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level", "SID"))
-jl.summ.sid <- summarySE(data = same.data_jl, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level", "SID"))
+sz.summ.sid <- summarySE(data = same.data_sz, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level", "SID", "Crit.Score"))
+jl.summ.sid <- summarySE(data = same.data_jl, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level", "SID", "Crit.Score"))
 
 shape.summ <- summarySE(data = same.data, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
 shape.summ.hi <- summarySE(data = same.data_hi, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
 shape.summ.mid <- summarySE(data = same.data_mid, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
 shape.summ.lo <- summarySE(data = same.data_lo, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
 
-jllj.summ <- summarySE(data = all_jl, measurevar = "Response.rt.box", groupvars = c("Type", "deg.diff.level"))
+jllj.summ <- summarySE(data = all_jl, measurevar = "Response.rt.box", groupvars = c("Type", "deg.diff.level", "Crit.level"))
 
 raw.data$Block_Number  <- as.factor(raw.data$Block_Number)
 
@@ -111,7 +111,8 @@ tzr_summary <- ddply(raw.data, .(Block_Number, Correct_Response), function (x){
 	m_rt = mean(x$Response.rt.box)
 	med_rt = median(x$Response.rt.box)
 	correct = mean(x$Answered_Correctly)
-	data.frame(total_blocks, trials_per_block, m_rt, med_rt, correct)
+	sid = x$SID
+	data.frame(total_blocks, trials_per_block, m_rt, med_rt, correct, sid)
 })
 
 SID.tzr.summ <- list()
@@ -123,9 +124,12 @@ for(this.data in SID.data)
 	m_rt = mean(x$Response.rt.box)
 	med_rt = median(x$Response.rt.box)
 	correct = mean(x$Answered_Correctly)
-	data.frame(total_blocks, trials_per_block, m_rt, med_rt, correct)
+	sid = x$SID
+	score = x$Crit.Score
+	data.frame(total_blocks, trials_per_block, m_rt, med_rt, correct, sid, score)
   })
   SID.tzr.summ[[length(SID.tzr.summ)+1]] <- this.tzr.summary
+  
 }
 
 
@@ -142,20 +146,37 @@ PLOTTING
 ```{r,tidy=TRUE}
 
 
-plt.7a <- ggplot(sz.summ.sid, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
-plt.7a + geom_line() + geom_point() + ylim(0, 2) + facet_grid(.~SID)
+plt.2a <- ggplot(jl.summ, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
+plt.2a + stat_summary(fun.y = mean, geom = "line") + stat_summary(fun.y = mean, geom = "point") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.05, position=position_dodge(width=0.3)) + ylim(0, 2) + theme_bw() + labs(title = "J/L Same Response Time", subtitle = paste("All paritcipants"), x = "Rel. Degree Differnece", y = "Response Time (s)")
 
-plt.7b <- ggplot(jl.summ.sid, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
-plt.7b + geom_line() + geom_point() + ylim(0, 2) + facet_grid(.~SID) 
+for(indi in unique(jl.summ.sid$SID))
+{
+  plt.7b <- ggplot(jl.summ.sid[jl.summ.sid$SID == indi,], aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid)) + geom_line() + geom_point() + ylim(0, 2) +
+	theme_bw() +
+  labs(title = "J/L Same Response Time (Individual)", subtitle = paste("SID: ", indi, "Crit. Score = ", jl.summ.sid[jl.summ.sid$SID == indi,]$Crit.Score), x = "Rel. Degree Differnece", y = "Response Time (s)")
+  png(paste(indi, ".png"))
+  print(plt.7b)
+  dev.off()
+}
+
+for(indi in unique(sz.summ.sid$SID))
+{
+  plt.7b <- ggplot(sz.summ.sid[jl.summ.sid$SID == indi,], aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid)) + geom_line() + geom_point() + ylim(0, 2) +
+	theme_bw() +
+  labs(title = "J/L Same Response Time (Individual)", subtitle = paste("SID: ", indi, "Crit. Score = ", jl.summ.sid[jl.summ.sid$SID == indi,]$Crit.Score), x = "Rel. Degree Differnece", y = "Response Time (s)")
+  png(paste(indi, ".png"))
+  print(plt.7b)
+  dev.off()
+}
 
 plt.8a <- ggplot(sz.summ, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
-plt.8a + stat_summary(fun.y = mean, geom = "line") + stat_summary(fun.y = mean, geom = "point") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.05, position=position_dodge(width=0.3)) + ylim(0, 2) + theme_bw()
+plt.8a + stat_summary(fun.y = mean, geom = "line") + stat_summary(fun.y = mean, geom = "point") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.05, position=position_dodge(width=0.3)) + ylim(0, 2) + theme_bw() + labs(title = "S/Z Same Response Time", subtitle = paste("All paritcipants"), x = "Rel. Degree Differnece", y = "Response Time (s)")
 
 plt.shape <- ggplot(shape.summ, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
 plt.shape + geom_line() + geom_point(size = 2.5) + ylim(0.5, 1.6) + theme_bw() + labs(title = "Response Time by Zoid and Orientation", subtitle = paste("all players, n =", all_n), y = "Response Time", x = "Abs. Degree Difference", colour = "Zoid Type") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2, position=position_dodge(width=0.3))
 
 plt.jl <- ggplot(jllj.summ, aes(x = deg.diff.level, y = Response.rt.box, group = Type))
-plt.jl + geom_line() + geom_point(size = 2.5) + ylim(0.5, 1.8) + theme_bw() + labs(title = "Response Time with all J L pairs", y = "Response Time", x = "Abs. Degree Difference") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2) + facet_grid(Type~.)
+plt.jl + geom_line() + geom_point(size = 2.5) + ylim(0.5, 2.5) + theme_bw() + labs(title = "Response Time with all J L pairs by high/mid/low skill levels (NA for missing scores)", y = "Response Time", x = "Abs. Degree Difference") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2) + facet_grid(Type~Crit.level)
 
 plt.shapelo <- ggplot(shape.summ.lo, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
 plt.shapelo + geom_line() + geom_point(size = 2.5) + ylim(0.5, 1.6) + theme_bw() + labs(title = "Response Time by Zoid and Orientation", subtitle = paste("low skill players (Crit. Score 0~7000), n =", lo_n), y = "Response Time", x = "Abs. Degree Difference", colour = "Zoid Type") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2, position=position_dodge(width=0.3))
@@ -199,17 +220,24 @@ for (this.summ in SID.tzr.summ)
 	geom_point() +
 	scale_shape_manual(values=c(17,19)) +
 	scale_color_manual(values=c("darkred", "darkblue")) +
-	theme_bw()
+	theme_bw() +
+  labs(title = "Proportion Correct for Same vs Different (Individual)", subtitle = paste("SID: ", this.summ$sid, "Crit. Score = ", this.summ$score))
+  png(paste(this.summ$sid, ".png"))
   print(subject_acc)
-  
-  tzr_medRT_by_SameDif_by_blk <- ggplot(tzr_summary, aes(x=Block_Number, y=med_rt, group=Correct_Response, color=Correct_Response)) +
+  dev.off()
+}
+for (this.summ in SID.tzr.summ)
+{
+  subj_time <- ggplot(this.summ, aes(x=Block_Number, y=med_rt, group=Correct_Response, color=Correct_Response)) +
 	geom_line() +
 	geom_point() +
 	scale_shape_manual(values=c(17,19)) +
 	scale_color_manual(values=c("darkred", "darkblue")) +
-	annotate(geom = "text", x=6, y=1.5, label = "Medium Response Time for Correct Response", color = "darkgreen") +
+	labs(title = "Proportion Correct for Same vs Different (Individual)", subtitle = paste("SID: ", this.summ$sid, "Crit. Score = ", this.summ$score)) +
 	theme_bw()
-tzr_medRT_by_SameDif_by_blk
+png(paste(this.summ$sid, ".png"))
+  print(subj_time)
+  dev.off()
 }
 
 
