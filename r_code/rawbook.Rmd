@@ -66,7 +66,17 @@ all_jl <- subset(raw.data, (Left_Zoid == "j" | Left_Zoid == "l")&(Right_Zoid == 
 
 all_jl$Type <- ifelse(all_jl$Left_Zoid == "j" & all_jl$Right_Zoid == "j", "J J", ifelse(all_jl$Left_Zoid == "j" & all_jl$Right_Zoid == "l", "J L", ifelse(all_jl$Left_Zoid == "l" & all_jl$Right_Zoid == "l", "L L", ifelse(all_jl$Left_Zoid == "l" & all_jl$Right_Zoid == "j", "L J", "error"))))
 
+all_sz <- subset(raw.data, (Left_Zoid == "z" | Left_Zoid == "s")&(Right_Zoid == "z" | Right_Zoid == "s"))
+
+all_sz$Type <- ifelse(all_sz$Left_Zoid == "z" & all_sz$Right_Zoid == "z", "Z Z", ifelse(all_sz$Left_Zoid == "z" & all_sz$Right_Zoid == "s", "Z S", ifelse(all_sz$Left_Zoid == "s" & all_sz$Right_Zoid == "s", "S S", ifelse(all_sz$Left_Zoid == "s" & all_sz$Right_Zoid == "z", "S Z", "error"))))
+
 all_jl$Crit.level <- ifelse(all_jl$Crit.Score <= 7000, "low", ifelse((same.data$Crit.Score > 7000 & same.data$Crit.Score <= 15000), "mid", "high"))
+
+all_jl$Crit.level <- factor(all_jl$Crit.level, levels = ordered(c("low", "mid", "high")))
+
+all_sz$Crit.level <- ifelse(all_sz$Crit.Score <= 7000, "low", ifelse((same.data$Crit.Score > 7000 & same.data$Crit.Score <= 15000), "mid", "high"))
+
+all_sz$Crit.level <- factor(all_sz$Crit.level, levels = ordered(c("low", "mid", "high")))
 
 all_n = length(unique(same.data$SID))
 same.data_lo <- subset(same.data, Crit.Score <= 7000)
@@ -87,7 +97,8 @@ shape.summ.hi <- summarySE(data = same.data_hi, measurevar = "Response.rt.box", 
 shape.summ.mid <- summarySE(data = same.data_mid, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
 shape.summ.lo <- summarySE(data = same.data_lo, measurevar = "Response.rt.box", groupvars = c("Left_Zoid", "deg.diff.level"))
 
-jllj.summ <- summarySE(data = all_jl, measurevar = "Response.rt.box", groupvars = c("Type", "deg.diff.level", "Crit.level"))
+jllj.summ <- summarySE(data = all_jl[!is.na(all_jl$Crit.Score),], measurevar = "Response.rt.box", groupvars = c("Type", "deg.diff.level", "Crit.level"))
+szzs.summ <- summarySE(data = all_sz[!is.na(all_sz$Crit.Score),], measurevar = "Response.rt.box", groupvars = c("Type", "deg.diff.level", "Crit.level"))
 
 raw.data$Block_Number  <- as.factor(raw.data$Block_Number)
 
@@ -176,7 +187,10 @@ plt.shape <- ggplot(shape.summ, aes(x = deg.diff.level, y = Response.rt.box, gro
 plt.shape + geom_line() + geom_point(size = 2.5) + ylim(0.5, 1.6) + theme_bw() + labs(title = "Response Time by Zoid and Orientation", subtitle = paste("all players, n =", all_n), y = "Response Time", x = "Abs. Degree Difference", colour = "Zoid Type") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2, position=position_dodge(width=0.3))
 
 plt.jl <- ggplot(jllj.summ, aes(x = deg.diff.level, y = Response.rt.box, group = Type))
-plt.jl + geom_line() + geom_point(size = 2.5) + ylim(0.5, 2.5) + theme_bw() + labs(title = "Response Time with all J L pairs by high/mid/low skill levels (NA for missing scores)", y = "Response Time", x = "Abs. Degree Difference") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2) + facet_grid(Type~Crit.level)
+plt.jl + geom_line() + geom_point(size = 2.5) + ylim(0.5, 2.5) + theme_bw() + labs(title = "Response Time with all J/L pairs by high/mid/low skill levels", y = "Response Time", x = "Abs. Degree Difference") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2) + facet_grid(Crit.level~Type)
+
+plt.sz <- ggplot(szzs.summ, aes(x = deg.diff.level, y = Response.rt.box, group = Type))
+plt.sz + geom_line() + geom_point(size = 2.5) + ylim(0.2, 3) + theme_bw() + labs(title = "Response Time with all S/Z pairs by high/mid/low skill levels", y = "Response Time", x = "Abs. Degree Difference") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2) + facet_grid(Crit.level~Type)
 
 plt.shapelo <- ggplot(shape.summ.lo, aes(x = deg.diff.level, y = Response.rt.box, group = Left_Zoid, color = Left_Zoid))
 plt.shapelo + geom_line() + geom_point(size = 2.5) + ylim(0.5, 1.6) + theme_bw() + labs(title = "Response Time by Zoid and Orientation", subtitle = paste("low skill players (Crit. Score 0~7000), n =", lo_n), y = "Response Time", x = "Abs. Degree Difference", colour = "Zoid Type") + geom_errorbar(aes(ymin=Response.rt.box-ci, ymax=Response.rt.box+ci), width = 0.2, position=position_dodge(width=0.3))
@@ -208,7 +222,7 @@ tzr_medRT_by_SameDif_by_blk <- ggplot(tzr_summary, aes(x=Block_Number, y=med_rt,
 	geom_point() +
 	scale_shape_manual(values=c(17,19)) +
 	scale_color_manual(values=c("darkred", "darkblue")) +
-	annotate(geom = "text", x=6, y=1.5, label = "Medium Response Time for Correct Response", color = "darkgreen") +
+	annotate(geom = "text", x=6, y=1.5, label = "Median Response Time for Correct Response", color = "darkgreen") +
 	theme_bw()
 tzr_medRT_by_SameDif_by_blk
 
