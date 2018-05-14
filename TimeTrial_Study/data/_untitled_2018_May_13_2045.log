@@ -1,0 +1,37 @@
+1.8379 	ERROR 	avbin.dll failed to load. Try importing psychopy.visual
+  as the first library (before anything that uses scipy)
+  and make sure that avbin is installed.
+10.9860 	EXP 	Created window1 = Window(allowGUI=False, allowStencil=False, autoLog=True, bitsMode=UNKNOWN, blendMode='avg', color=array([ 0.,  0.,  0.]), colorSpace='rgb', fullscr=UNKNOWN, gamma=None, lms=UNKNOWN, monitor=<psychopy.monitors.calibTools.Monitor object at 0x192F9370>, multiSample=False, name='window1', numSamples=2, pos=[0, 0], screen=0, size=array([1600,  900]), stereo=False, units=u'norm', useFBO=True, useRetina=False, viewOri=0.0, viewPos=None, viewScale=None, waitBlanking=True, winType='pyglet')
+10.9860 	EXP 	window1: recordFrameIntervals = False
+11.1512 	EXP 	window1: recordFrameIntervals = True
+11.3347 	EXP 	window1: recordFrameIntervals = False
+11.3694 	EXP 	Created dots = DotStim(autoLog=True, coherence=1.0, color=array([ 1.,  1.,  1.]), colorSpace='rgb', contrast=1.0, depth=0.0, dir=0.0, dotLife=3, dotSize=2, element=None, fieldPos=array([ 0.,  0.]), fieldShape='circle', fieldSize=array([ 1.,  1.]), nDots=100, name='dots', noiseDots='direction', opacity=1.0, rgb=array([ 1.,  1.,  1.]), signalDots='same', speed=0.1, units=u'norm', win=Window(...))
+11.3811 	EXP 	dots: autoDraw = True
+107.0747 	DATA 	Mouse: wheel shift=(0,-2), pos=(746,105)
+107.0773 	DATA 	Mouse: wheel shift=(0,-4), pos=(746,105)
+107.0908 	DATA 	Mouse: wheel shift=(0,-3), pos=(746,105)
+107.1071 	DATA 	Mouse: wheel shift=(0,-5), pos=(746,105)
+107.1110 	DATA 	Mouse: wheel shift=(0,-4), pos=(746,105)
+107.1244 	DATA 	Mouse: wheel shift=(0,-6), pos=(746,105)
+107.1413 	DATA 	Mouse: wheel shift=(0,-3), pos=(746,105)
+107.1414 	DATA 	Mouse: wheel shift=(0,-5), pos=(746,105)
+107.1574 	DATA 	Mouse: wheel shift=(0,-12), pos=(746,105)
+107.2076 	DATA 	Mouse: wheel shift=(0,-3), pos=(746,105)
+107.2106 	DATA 	Mouse: wheel shift=(0,-3), pos=(746,105)
+107.2267 	DATA 	Mouse: wheel shift=(0,-3), pos=(746,105)
+107.2412 	DATA 	Mouse: wheel shift=(0,-2), pos=(746,105)
+107.2601 	DATA 	Mouse: wheel shift=(0,-2), pos=(746,105)
+107.2738 	DATA 	Mouse: wheel shift=(0,-2), pos=(746,105)
+107.2906 	DATA 	Mouse: wheel shift=(0,-2), pos=(746,105)
+107.3073 	DATA 	Mouse: wheel shift=(0,-2), pos=(746,105)
+107.3245 	DATA 	Mouse: wheel shift=(0,-2), pos=(746,105)
+107.3408 	DATA 	Mouse: wheel shift=(0,-1), pos=(746,105)
+107.3575 	DATA 	Mouse: wheel shift=(0,-1), pos=(746,105)
+107.3737 	DATA 	Mouse: wheel shift=(0,-1), pos=(746,105)
+107.3906 	DATA 	Mouse: wheel shift=(0,-1), pos=(746,105)
+107.4073 	DATA 	Mouse: wheel shift=(0,-1), pos=(746,105)
+107.4242 	DATA 	Mouse: wheel shift=(0,-1), pos=(746,105)
+107.4407 	DATA 	Mouse: wheel shift=(0,-1), pos=(746,105)
+107.6240 	DATA 	Mouse: Left button down, pos=(745,106)
+107.7573 	DATA 	Mouse:  Left button up, pos=(745,106)
+111.3946 	EXP 	window1: mouseVisible = True
